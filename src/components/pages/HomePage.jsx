@@ -1,27 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 
 export default function HomePage() {
-  const [walletAddress, setWalletAddress] = useState('');
-
-  useEffect(() => {
-    // 사용자 프로필 정보를 가져오는 API 호출
-    const fetchProfile = async () => {
-      try {
-        const response = await axios.get('http://your-api-domain/users/profile/'); // API URL을 실제 값으로 변경하세요
-        if (response.status === 200) {
-          setWalletAddress(response.data.xrpl_wallet_address); // 프로필 데이터에서 지갑 주소를 설정
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
   return (
     <>
       <div className="text-center">
@@ -53,13 +34,9 @@ export default function HomePage() {
           This is an innovative voting system using XRP. Our goal is to have transparency, security, and global accessibility as a new voting system using blockchain.
         </p>
       </div>
-      {walletAddress && (
-        <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '12px', color: 'gray' }}>
-          Wallet Address: {walletAddress}
-        </div>
-      )}
     </>
   );
 }
+
 
 
