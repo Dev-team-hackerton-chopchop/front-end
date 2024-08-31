@@ -8,7 +8,6 @@ import '../../App.css';
 export default function CreateVote() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [choice, setChoice] = useState('O');  // 선택 필드 추가
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ export default function CreateVote() {
     };
 
     try {
-      // Step 1: Create a post and get the post pk from the response
+      // Step 1: Create a post and get the post ID (pk) from the response
       const postResponse = await axios.post('http://localhost:8000/posts/', voteData, {
         headers: {
           'Content-Type': 'application/json',
@@ -31,28 +30,13 @@ export default function CreateVote() {
       });
 
       if (postResponse.status === 201) {
-        const postId = postResponse.data.pk; // API가 새로운 게시물의 pk 반환을 가정
-
-        // Step 2: Use the post pk to register a vote with the choice
-        const voteResponse = await axios.post(`http://localhost:8000/posts/${postId}/vote/`, {
-          choice: choice,  // choice 필드를 포함하여 전송
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (voteResponse.status === 201) {
-          navigate('/Middle');
-        } else {
-          setError('Failed to register vote.');
-        }
+        navigate('/Middle');  // 게시물 생성 후 Middle 페이지로 이동
       } else {
         setError('Failed to create post.');
       }
     } catch (error) {
-      console.error('Error creating post or vote:', error);
-      setError('Error creating post or vote.');
+      console.error('Error creating post:', error);
+      setError('Error creating post.');
     } finally {
       setLoading(false);
     }
@@ -91,23 +75,6 @@ export default function CreateVote() {
               placeholder="Enter vote content" 
               required
             />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mt-3">
-        <Col className="custom-col">
-          <Form.Group controlId="formChoice">
-            <Form.Label>Choice:</Form.Label>
-            <Form.Control 
-              as="select"
-              value={choice}
-              onChange={(e) => setChoice(e.target.value)}
-              required
-            >
-              <option value="O">O</option>
-              <option value="X">X</option>
-            </Form.Control>
           </Form.Group>
         </Col>
       </Row>
