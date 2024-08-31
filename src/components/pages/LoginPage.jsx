@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'axios'; // axios import
 import '../../App.css';
 import BackgroundImage from '../../assets/images/background-img2.png';
 
@@ -34,12 +34,12 @@ export default function SignInPage() {
 
     try {
       // 로그인 API 요청 보내기
-      const response = await axios.post('http://localhost:8000/users/login/', {
+      const response = await axios.post('http://127.0.0.1:8000/users/login/', {
         username: formData.username,
         password: formData.password,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         // 로그인 성공 시 토큰 저장 (예시)
         const token = response.data.token;
         localStorage.setItem('authToken', token);
@@ -73,55 +73,62 @@ export default function SignInPage() {
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
-    margin: 0, // 여백 제거
-    padding: 0, // 여백 제거
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
   };
 
+  const formContainerStyle = {
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // 반투명한 흰색 배경
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+  };
+
   return (
-    <div style={headerStyle} className="text-center">
-      <h2>Sign in to us</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <p>
-          <label>Username</label>
-          <br />
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </p>
-        <p>
-          <label>Password</label>
-          <br />
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </p>
-        <p>
-          <button id="sub_btn" type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </p>
-      </form>
-      <footer>
-        <p>
-          First time? <Link to="/register">Create an account</Link>.
-        </p>
-        <p>
-          <Link to="/">Back to Homepage</Link>.
-        </p>
-      </footer>
+    <div style={headerStyle}>
+      <div style={formContainerStyle} className="text-center">
+        <h2>Sign in to us</h2>
+        {error && <p className="error">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <p>
+            <label>Username</label>
+            <br />
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </p>
+          <p>
+            <label>Password</label>
+            <br />
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </p>
+          <p>
+            <button id="sub_btn" type="submit" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </p>
+        </form>
+        <footer>
+          <p>
+            First time? <Link to="/register">Create an account</Link>.
+          </p>
+          <p>
+            <Link to="/">Back to Homepage</Link>.
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }

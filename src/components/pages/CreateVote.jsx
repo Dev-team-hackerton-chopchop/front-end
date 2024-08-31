@@ -8,55 +8,48 @@ import '../../App.css';
 export default function CreateVote() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null);
-  const [publishedDate, setPublishedDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [department, setDepartment] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-  };
 
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
-
-    // Profile data as JSON string
-    const profileData = JSON.stringify({
-      nickname: nickname,
-      department: department,
-    });
-    formData.append('profile', profileData);
-
-    if (image) {
-      formData.append('image', image);
-    }
-    formData.append('published_date', publishedDate);
-    formData.append('end_date', endDate);
+    const voteData = {
+      title: title,
+      content: content,
+    };
 
     try {
-      const response = await axios.post('http://localhost:8000/posts/', formData, {
+      // Step 1: Create a post and get the post_id from the response
+      const postResponse = await axios.post('http://localhost:8000/posts/', voteData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
 
-      if (response.status === 201) {
-        navigate('/Middle');
+      if (postResponse.status === 201) {
+        const postId = postResponse.data.id; // Assuming the API returns the new post ID
+
+        // Step 2: Use the post_id to register a vote
+        const voteResponse = await axios.post(`http://localhost:8000/posts/posts/${postId}/vote/`, {}, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (voteResponse.status === 201) {
+          navigate('/Middle');
+        } else {
+          setError('Failed to register vote.');
+        }
       } else {
-        setError('Failed to create vote.');
+        setError('Failed to create post.');
       }
     } catch (error) {
-      console.error('Error creating vote:', error);
-      setError('Error creating vote.');
+      console.error('Error creating post or vote:', error);
+      setError('Error creating post or vote.');
     } finally {
       setLoading(false);
     }
@@ -93,77 +86,6 @@ export default function CreateVote() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Enter vote content" 
-              required
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mt-3">
-        <Col className="custom-col">
-          <Form.Group controlId="formNickname">
-            <Form.Label>Nickname:</Form.Label>
-            <Form.Control 
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="Enter your nickname"
-              required
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mt-3">
-        <Col className="custom-col">
-          <Form.Group controlId="formDepartment">
-            <Form.Label>Department:</Form.Label>
-            <Form.Control 
-              type="text"
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              placeholder="Enter your department"
-              required
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mt-3">
-        <Col className="custom-col">
-          <Form.Group controlId="formImage">
-            <Form.Label>Image:</Form.Label>
-            <Form.Control 
-              type="file"
-              onChange={handleImageChange}
-              accept="image/*"
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mt-3">
-        <Col className="custom-col">
-          <Form.Group controlId="formPublishedDate">
-            <Form.Label>Published Date:</Form.Label>
-            <Form.Control 
-              type="datetime-local"
-              value={publishedDate}
-              onChange={(e) => setPublishedDate(e.target.value)}
-              required
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mt-3">
-        <Col className="custom-col">
-          <Form.Group controlId="formEndDate">
-            <Form.Label>End Date:</Form.Label>
-            <Form.Control 
-              type="datetime-local"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
               required
             />
           </Form.Group>

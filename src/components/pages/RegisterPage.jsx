@@ -9,11 +9,10 @@ export default function SignUpPage() {
 
   // 폼 데이터를 상태로 관리
   const [formData, setFormData] = useState({
-    username: '', // 필드 이름을 'first_name'에서 'username'으로 변경
+    username: '',
     email: '',
     password: '',
     password2: '', // 비밀번호 확인용 필드
-    xrpl_wallet_address: '', // 지갑 주소 필드
   });
 
   // 로딩 및 오류 상태 관리
@@ -44,12 +43,11 @@ export default function SignUpPage() {
 
     try {
       // API 요청 보내기
-      const response = await axios.post('http://your-api-domain/users/register/', {
-        username: formData.username, // 필드 이름 수정
+      const response = await axios.post('http://127.0.0.1:8000/users/register/', {
+        username: formData.username,
         email: formData.email,
         password: formData.password,
-        password2: formData.password2, // 비밀번호 확인용 필드 전달
-        xrpl_wallet_address: formData.xrpl_wallet_address, // 지갑 주소 전달
+        password2: formData.password2,
       });
 
       if (response.status === 201) {
@@ -68,6 +66,7 @@ export default function SignUpPage() {
     }
   };
 
+  // 스타일 설정
   const headerStyle = {
     width: "100%",
     height: "100vh",
@@ -102,7 +101,7 @@ export default function SignUpPage() {
             <br />
             <input
               type="text"
-              name="username" // 필드 이름 수정
+              name="username"
               value={formData.username}
               onChange={handleChange}
               required
@@ -131,23 +130,12 @@ export default function SignUpPage() {
             />
           </p>
           <p>
-            <label>Confirm Password</label> {/* 비밀번호 확인 필드 */}
+            <label>Confirm Password</label>
             <br />
             <input
               type="password"
               name="password2"
               value={formData.password2}
-              onChange={handleChange}
-              required
-            />
-          </p>
-          <p>
-            <label>XRPL Wallet Address</label> {/* 지갑 주소 필드 */}
-            <br />
-            <input
-              type="text"
-              name="xrpl_wallet_address"
-              value={formData.xrpl_wallet_address}
               onChange={handleChange}
               required
             />
