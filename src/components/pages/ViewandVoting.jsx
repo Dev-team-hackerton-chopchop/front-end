@@ -4,7 +4,7 @@ import axios from 'axios';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS 추가
-import votecard from '../../assets/images/votecard.png'
+import votecard from '../../assets/images/votecard.png';
 
 export default function ViewandVoting() {
   const [votes, setVotes] = useState([]);
@@ -15,6 +15,7 @@ export default function ViewandVoting() {
   useEffect(() => {
     const fetchVotes = async () => {
       try {
+        // GET /posts/ API 호출
         const response = await axios.get('http://localhost:8000/posts/');
         setVotes(response.data);
         setLoading(false);
@@ -27,36 +28,29 @@ export default function ViewandVoting() {
     fetchVotes();
   }, []);
 
-  // 투표 처리 핸들러
-  const handleVote = async (id, type) => {
+  // 좋아요 처리 핸들러
+  const handleVote = async (id) => {
     try {
       const voteToUpdate = votes.find(vote => vote.pk === id);
       const updatedVote = {
         ...voteToUpdate,
-        likes: type === 'agree' ? voteToUpdate.likes + 1 : voteToUpdate.likes,
-        dislikes: type === 'disagree' ? voteToUpdate.dislikes + 1 : voteToUpdate.dislikes,
+        likes: voteToUpdate.likes + 1,
       };
 
+      // PATCH /posts/{id}/ API 호출 - 좋아요 수 증가
       await axios.patch(`http://localhost:8000/posts/${id}/`, {
         likes: updatedVote.likes,
-        dislikes: updatedVote.dislikes
       }, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
+      // 로컬 상태 업데이트
       setVotes(votes.map(vote => (vote.pk === id ? updatedVote : vote)));
     } catch (err) {
       setError('Failed to submit your vote');
     }
-  };
-
-  // 투표 마감 여부를 확인하는 함수
-  const isVoteClosed = (endDate) => {
-    const now = new Date();
-    const voteEndDate = new Date(endDate);
-    return now > voteEndDate;
   };
 
   if (loading) {
@@ -78,22 +72,12 @@ export default function ViewandVoting() {
               <Card.Body>
                 <Card.Title>{vote.title}</Card.Title>
                 <Card.Text>{vote.content}</Card.Text>
-                {!isVoteClosed(vote.end_date) && (
-                  <div>
-                    <Button variant="success" onClick={() => handleVote(vote.pk, 'agree')} className="me-2">
-                      Like {vote.likes}
-                    </Button>
-                    <Button variant="danger" onClick={() => handleVote(vote.pk, 'disagree')}>
-                      Dislike {vote.dislikes}
-                    </Button>
-                  </div>
-                )}
-                {isVoteClosed(vote.end_date) && (
-                  <p>Vote has ended.</p>
-                )}
-                <Card.Footer className="text-muted">
-                  Ends on: {new Date(vote.end_date).toLocaleString()}
-                </Card.Footer>
+                <Button 
+                  variant="success" 
+                  onClick={() => handleVote(vote.pk)} 
+                  className="me-2">
+                  Like {vote.likes}
+                </Button>
               </Card.Body>
             </Card>
           </div>

@@ -33,29 +33,26 @@ export default function SignInPage() {
     setError(''); // 이전 오류 상태 초기화
 
     try {
-      // 로그인 API 요청 보내기
-      const response = await axios.post('http://localhost:8000/users/login/', {
-        username: formData.username,
-        password: formData.password,
-      });
+      // 서버에서 저장된 사용자 정보 불러오기
+      const response = await axios.get('http://127.0.0.1:8000/users/'); // 등록된 사용자 목록을 가져옴
 
-      if (response.status === 200) {
-        // 로그인 성공 시 토큰 저장 (예시)
-        const token = response.data.token;
-        localStorage.setItem('authToken', token);
+      const users = response.data; // 사용자 데이터
+      const user = users.find(
+        (u) => u.username === formData.username && u.password === formData.password
+      );
 
-        // 홈 페이지로 이동
+      if (user) {
+        // 로그인 성공 시 홈 페이지로 이동
         navigate('/home');
       } else {
-        // 다른 상태 코드에 대한 처리
-        setError('로그인에 실패했습니다.');
+        // 사용자 정보가 일치하지 않는 경우
+        setError('잘못된 사용자 이름 또는 비밀번호입니다.');
       }
     } catch (error) {
       // 오류 처리
       setError('로그인 요청 중 오류가 발생했습니다.');
       console.error('로그인 요청 중 오류가 발생했습니다.', error);
 
-      // 서버에서 반환된 오류 메시지 처리 (예시)
       if (error.response && error.response.data && error.response.data.detail) {
         setError(error.response.data.detail);
       } else {
